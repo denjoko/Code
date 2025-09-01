@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akses Dibatasi Sementara</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f9; color: #333; text-align: center; padding: 40px 20px; }
+        .container { background-color: #fff; border: 1px solid #ddd; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: inline-block; padding: 30px 40px; max-width: 500px; }
+        h1 { color: #e91e63; font-size: 24px; margin-bottom: 10px; }
+        p { font-size: 16px; line-height: 1.6; }
+        .timer-box { background-color: #fce4ec; border: 2px dashed #e91e63; border-radius: 8px; padding: 20px; margin-top: 25px; }
+        .timer-box p { margin: 5px 0; }
+        #unlockTime { font-weight: bold; color: #c2185b; }
+        #countdown { font-size: 28px; font-weight: bold; color: #d81b60; letter-spacing: 2px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Akses TikTok Dibatasi</h1>
+        <p>Anda telah menggunakan lebih dari 500 MB kuota TikTok. Akses Anda dibatasi untuk sementara waktu guna menjaga kestabilan jaringan.</p>
+        
+        <div class="timer-box">
+            <p>Anda dapat mengakses kembali pada pukul:</p>
+            <p id="unlockTime">Menghitung...</p>
+            <p>Waktu tersisa:</p>
+            <h2 id="countdown">Menghitung...</h2>
+        </div>
+        <p style="margin-top: 20px; font-size: 14px; color: #777;">Silakan tutup halaman ini dan coba lagi nanti.</p>
+    </div>
+
+    <script>
+        // --- KONFIGURASI ---
+        // Atur durasi blokir dalam MENIT. 2 jam = 120 menit.
+        const blockDurationMinutes = 120; 
+        // -------------------
+
+        const countdownElement = document.getElementById('countdown');
+        const unlockTimeElement = document.getElementById('unlockTime');
+
+        // Waktu saat halaman ini dimuat (diasumsikan sebagai waktu mulai blokir)
+        const loadTime = new Date();
+        
+        // Hitung waktu selesai blokir
+        const unlockTime = new Date(loadTime.getTime() + blockDurationMinutes * 60 * 1000);
+
+        // Format waktu selesai blokir (misal: 14:30:55)
+        const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+        unlockTimeElement.textContent = unlockTime.toLocaleTimeString('id-ID', options);
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = unlockTime - now;
+
+            // Jika waktu hitung mundur sudah selesai
+            if (distance < 0) {
+                clearInterval(timerInterval);
+                countdownElement.innerHTML = "WAKTU HABIS";
+                countdownElement.style.color = "#4CAF50"; // Ubah warna jadi hijau
+                unlockTimeElement.textContent = "Akses Seharusnya Sudah Kembali Normal";
+                return;
+            }
+
+            // Perhitungan waktu
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Tampilkan hasilnya
+            countdownElement.textContent = 
+                String(hours).padStart(2, '0') + " Jam : " + 
+                String(minutes).padStart(2, '0') + " Menit : " + 
+                String(seconds).padStart(2, '0') + " Detik";
+        }
+
+        // Panggil fungsi sekali agar tidak ada jeda 1 detik
+        updateCountdown();
+
+        // Perbarui hitung mundur setiap 1 detik
+        const timerInterval = setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
